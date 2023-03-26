@@ -1,5 +1,5 @@
 from rest_framework import serializers
 
 
-class SensorSerializer(serializers.Serializer):
+class ManufacturerSerializer(serializers.Serializer):
     pass

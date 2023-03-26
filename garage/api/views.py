@@ -1,9 +1,9 @@
 from rest_framework import viewsets
 
-from sensors.models import Sensor
-from .serializers import SensorSerializer
+from sensors.models import Manufacturer
+from .serializers import ManufacturerSerializer
 
 
-class SensorsViewSet(viewsets.ReadOnlyModelViewSet):
-    queryset = Sensor.objects.all()
-    serializer_class = SensorSerializer
+class ManufacturerViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Manufacturer.objects.all()
+    serializer_class = ManufacturerSerializer

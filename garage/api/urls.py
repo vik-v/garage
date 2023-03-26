@@ -1,5 +1,5 @@
 from api.views import (
-    SensorsViewSet,
+    ManufacturerViewSet,
 )
 
 from django.urls import include, path
@@ -11,7 +11,9 @@ from rest_framework.routers import DefaultRouter
 app_name = 'api'
 
 router_v1 = DefaultRouter()
-router_v1.register('sensors', SensorsViewSet, basename='sensors')
+router_v1.register('manufacturers',
+                   ManufacturerViewSet,
+                   basename='manufacturers')
 
 urlpatterns = [
     path('v1/', include(router_v1.urls)),
