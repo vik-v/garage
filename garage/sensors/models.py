@@ -42,8 +42,8 @@ class Room(ModelWithDescription):
                              choices=FLOOR_VALUES)
     garage = models.ForeignKey(Garage,
                                on_delete=models.CASCADE,
-                               related_name="garage",
-                               related_query_name="garage",)
+                               related_name="rooms",
+                               related_query_name="rooms",)
 
     class Meta:
         verbose_name = 'Room'
@@ -67,6 +67,9 @@ class Manufacturer(ModelWithDescription):
         verbose_name = 'Manufacturer'
         verbose_name_plural = 'Manufacturers'
 
+    def __str__(self) -> str:
+        return self.name
+
 
 class Sensor(ModelWithDescription):
     SENSOR_TYPES = (
@@ -74,24 +77,27 @@ class Sensor(ModelWithDescription):
         ('PIR', 'Motin detection'),
         ('PR', 'Pressure sensor'),
     )
-
+    status = models.BooleanField('Active')
     name = models.CharField('Sensor name',
                             max_length=255)
     manufacturer = models.ForeignKey(Manufacturer,
                                      on_delete=models.SET_NULL,
                                      blank=True,
-                                     null=True)
+                                     null=True,)
     type = models.CharField('Sensor type',
                             max_length=3,
                             choices=SENSOR_TYPES)
     room = models.ForeignKey(Room,
                              on_delete=models.CASCADE,
-                             related_name="room",
-                             related_query_name="room",)
-    status = models.BooleanField('Status')
+                             related_name="sensors",
+                             related_query_name="sensors",)
 
     class Meta:
         pass
+
+    def __str__(self):
+        return (f'Sensor: {self.type} -> {self.get_type_display()}'
+                f' -- {self.name} in {self.room.name}')
 
 
 class DHT(Sensor):
@@ -105,6 +111,7 @@ class DHT(Sensor):
 
 class PIR(Sensor):
     detection = models.BooleanField('Motion detection')
+    action_datetime = models.DateTimeField()
 
 
 class PR(Sensor):
@@ -112,12 +119,10 @@ class PR(Sensor):
 
 
 class Statistic(models.Model):
-    action_date_start = models.DateTimeField()
-    action_date_end = models.DateTimeField()
-    sensor = models.ForeignKey(Sensor,
-                               on_delete=models.CASCADE,
-                               related_name="sensor",
-                               related_query_name="sensor",)
+    garage = models.ForeignKey(Garage, on_delete=models.CASCADE,)
+    # floor = models.ForeignKey(Room, on_delete=models.CASCADE)
+    room = models.ForeignKey(Room, on_delete=models.CASCADE,)
+    sensor = models.ForeignKey(Sensor, on_delete=models.CASCADE,)
 
     class Meta:
         pass
