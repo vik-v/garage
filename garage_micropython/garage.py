@@ -1,9 +1,8 @@
-import ntptime
 import machine
 import esp32
+import ntptime
 import dht
 import time
-from singletons import get_logger
 
 
 machine.freq()
@@ -13,10 +12,19 @@ esp32.hall_sensor()
 esp32.raw_temperature()
 esp32.ULP()
 
-SSID = 'subnet'
-KEY = 'xam_8B0*'
+SSID = ''
+KEY = ''
 
-DHT_SENSOR_1_PIN = 13
+TIMEZONE = 3
+NTP_SERVER_ADDRESS = '0.ru.pool.ntp.org'
+
+DHT_SENSOR_1_PIN = 34
+DHT_SENSOR_2_PIN = 35
+DHT_SENSOR_3_PIN = 32
+
+dht_sensor_1 = dht.DHT22(machine.Pin(DHT_SENSOR_1_PIN))
+dht_sensor_2 = dht.DHT22(machine.Pin(DHT_SENSOR_2_PIN))
+dht_sensor_3 = dht.DHT22(machine.Pin(DHT_SENSOR_3_PIN))
 
 
 def fahrenheit_to_celsius(temperature: float) -> float:
@@ -32,7 +40,7 @@ def do_connect(ssid: str, key: str) -> tuple[bool, str]:
         wlan.connect(SSID, KEY)
         while not wlan.isconnected():
             pass
-    return True, f'network config: {wlan.ifconfig()}'
+    return (True, f'network config: {wlan.ifconfig()}')
 
 
 def get_dht_measure(sensor: dht) -> tuple[float, float]:
@@ -42,9 +50,13 @@ def get_dht_measure(sensor: dht) -> tuple[float, float]:
     except Exception:
         pass
 
-do_connect(SSID, KEY)
 
-dht_sensor_1 = dht.DHT22(machine.Pin(DHT_SENSOR_1_PIN))
+if do_connect(SSID, KEY)[0]:
+    print("Local time before synchronization：%s" % str(time.localtime()))
+    # ntptime.settime(timezone=TIMEZONE, server=NTP_SERVER_ADDRESS)
+    ntptime.settime()
+    print("Local time after synchronization：%s" % str(time.localtime()))
+
 
 # while True:
 try:
@@ -53,8 +65,3 @@ try:
     print('\n')
 except Exception:
     pass
-
-
-print("Local time before synchronization：%s" % str(time.localtime()))
-ntptime.settime()
-print("Local time after synchronization：%s" % str(time.localtime()))
